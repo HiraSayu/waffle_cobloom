@@ -4,6 +4,7 @@
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="styleforhome.css">
+        
         <title>ホーム：進捗確認</title>
     </head>
     <body>
@@ -11,7 +12,7 @@
             <h1>co bloom</h1>
             <ul class="menu-list">
                 <li><a href="#">Home</a></li>
-                <li><a href="#">login</a></li>
+                <li><a href="#">loginuser:</a><p id="user"></p></li>
                 <li><a href="#">Services</a></li>
               </ul>
         </div>
@@ -19,37 +20,40 @@
 
         <div class="userdata">
             <div class="usercard" id="user1">
-                <p>username</p>
-                <p>progress</p>
+                <p>username:<span id="user1nameValue"></span></p>
+                <p>progress:<span class="progress" id="user1proValue">nodata</span></p>
                 <p>date</p>
                 <button>detail</button>
             </div>
 
             <div class="usercard" id="user2">
-                <p>username</p>
-                <p>progress</p>
+                <p>username:<span id="user2nameValue"></span></p>
+                <p>progress:<span class="progress" id="user2proValue">nodata</span></p>
                 <p>date</p>
                 <button>detail</button>
             </div>
 
             <div class="usercard" id="user3">
-                <p>username</p>
-                <p>progress</p>
+                <p>username:<span id="user3nameValue"></span></p>
+                <p>progress:<span class="progress" id="user3proValue">nodata</span></p>
                 <p>date</p>
                 <button>detail</button>
             </div>
 
-            <div class="usercard" id="user3">
-                <p>username</p>
-                <p>progress</p>
+            <div class="usercard" id="user4">
+                <p>username:<span id="user4nameValue"></span></p>
+                <p>progress:<span class="progress" id="user4proValue">nodata</span></p>
                 <p>date</p>
                 <button>detail</button>
             </div>
         </div>
-
         <div id="flower">
             <p>花の成長</p>
-            <p>--%</p>
+            <p><span id="flowerGrow"></span>%</p>
+            <div id="floImageContainer">
+                <img src="" alt="Image">
+              </div>
+              
         </div>
        
 
@@ -57,15 +61,18 @@
     <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/6.3.4/firebase-firestore.js"></script>
     <script>
+        
         const firebaseConfig = {
-    apiKey: "AIzaSyBjXAR91AtyS_vS10Sdl47_cvHetrvYI6U",
-    authDomain: "co-bloom.firebaseapp.com",
-    databaseURL: "https://co-bloom-default-rtdb.firebaseio.com",
-    projectId: "co-bloom",
-    storageBucket: "co-bloom.appspot.com",
-    messagingSenderId: "400310248137",
-    appId: "1:400310248137:web:042dcd6eb93aa25384a318"
+    apiKey: "AIzaSyClRttDuVyPHWhSzDuxGyXSAin01u4bf0A",
+    authDomain: "test223-c5e18.firebaseapp.com",
+    databaseURL: "https://test223-c5e18-default-rtdb.firebaseio.com",
+    projectId: "test223-c5e18",
+    storageBucket: "test223-c5e18.appspot.com",
+    messagingSenderId: "188900195709",
+    appId: "1:188900195709:web:4d9056e95c832c7f8e6014",
+    measurementId: "G-Y4XYD1R02E"
     };
+    
 
     // Initialize Firebase
 
@@ -77,30 +84,113 @@
     const db = firebase.firestore();
 
     //↓前回までの数字を入れておく
-    document.getElementById("inputData").value = 10;
+    
+    //pro1の進捗計算処理
+    //const progress1 = document.getElementById("pro1").value;
+    
+    var docRef = db.collection("sampleMember").doc("mem1");
 
-        document.querySelector('#submitButton').addEventListener('click', function() {
-            let readInput = Number(document.getElementById("readData").value);
-            let sumInput = Number(document.getElementById("sumData").value);
-            let presenInput = Number(document.getElementById("presenData").value);
-
-            if(nameInput==null || ageInput == null){
-                document.getElementById('result').innerHTML = "値を入力してください";
-            }else{
-                db.collection('users')
-                .add({
-                    age:ageInput,
-                    name:nameInput
-                })
-                .then(function(docRef) {
-                    console.log('Document written with ID: ', docRef.id);
-                    document.getElementById('result').innerHTML = "登録完了！";
-                })
-                .catch(function(error) {
-                    console.error('Error adding document: ', error);
-                });
-            }
+    docRef.get().then((doc) => {
+        if (doc.exists) {
+            console.log("Document data:", doc.data());
+        } else {
+            // doc.data() will be undefined in this case
+            console.log("No such document!");
+        }
+    }).catch((error) => {
+        console.log("Error getting document:", error);
     });
+
+    /* v9での実装方法
+    const seminame = 'tanaka_semi';
+    const membername = 'mem4';
+    var docRef2 = getDoc(doc(db, 'seminers', seminame,membername));
+    */
+
+    //修正後
+    //const collectionRef = db.collection('seminers').doc("tanaka_semi").collection('members');
+
+    /*
+    collectionRef.get()
+    .then((querySnapshot) => {
+        querySnapshot.forEach((doc) => {
+        if (doc.exists) {
+            console.log("Document data:", doc.data());
+        } else {
+            console.log("No such document!");
+        }
+        });
+    })
+    .catch((error) => {
+        console.log("Error getting documents:", error);
+    });
+    */
+
+    const collectionRef = db.collection('seminers').doc("tanaka_semi").collection('members');
+
+    collectionRef.get()
+    .then((querySnapshot) => {
+        const membersData = {}; // メンバーデータを格納するオブジェクト
+
+        querySnapshot.forEach((doc) => {
+        if (doc.exists) {
+            // uidをキーとして、メンバーデータをオブジェクトに格納
+            membersData[doc.id] = doc.data();
+        } else {
+            console.log("No such document!");
+        }
+        });
+
+        // 格納したメンバーデータを出力する
+        console.log("Members Data:", membersData);
+
+        //進捗：読み進めたページ*100/担当ページ数
+        /*
+        const pro1 = Math.round((membersData["mem1"].end-membersData["mem1"].read)*100/(membersData["mem1"].end-membersData["mem1"].start));
+        document.getElementById("user1proValue").innerHTML = `${pro1}%`;
+        */
+
+        //k：全員の読み進めたページ数の合計
+        let k = 0;
+        //このfor文の中で、進捗の計算と表示を行う
+        for(let i = 1;i<5;i++){
+            let tempName = "mem"+i;
+
+            k = k+(membersData[tempName].end-membersData[tempName].read);
+            //進捗の％の計算
+            let tempValue = Math.round((membersData[tempName].end-membersData[tempName].read)*100/(membersData[tempName].end-membersData[tempName].start));
+            //HTML内の進捗表示用タグの値
+            let tempHTMLProValue = "user" + i + "proValue";
+             //HTML内のユーザ名表示用タグの値
+            let tempHTMLNameValue = "user" + i + "nameValue";
+            document.getElementById(tempHTMLProValue).innerHTML = `${tempValue}%`;
+            document.getElementById(tempHTMLNameValue).innerHTML = membersData[tempName].name;
+        }
+
+        const AllProgress =  Math.round(k*100/60);
+        //全員の読み進めたページ数/全体のページ数
+        if(k>=60){
+            document.getElementById("flowerGrow").innerHTML = 100;
+        }else{
+        document.getElementById("flowerGrow").innerHTML = AllProgress;
+        }
+
+        let imagePath = "";
+
+        if(AllProgress<=20){
+            imagePath = "img/"
+        }
+        
+    })
+    .catch((error) => {
+        console.log("Error getting documents:", error);
+    });
+    
+    /*
+    subCollection.forEach(doc => {
+        console.log(doc.data());
+    });
+    */
        
     </script>
 </html>
